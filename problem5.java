@@ -7,11 +7,11 @@ public class problem5 {
 
         for (int a = 1; a <= n; a++) {
             for (int b = a; b <= n; b++) {
-                int c2 = a * a + b * b;
-                int c = (int) Math.sqrt(c2);
+                int sum = a * a + b * b;
+                int x= (int) Math.sqrt(sum);
 
-                if (c * c == c2 && c <= n) {
-                    count += (a == b) ? 1 : 2;
+                if (x* x == sum && x <= n) {
+                    count+=2;
                 }
             }
         }
@@ -27,3 +27,4 @@ public class problem5 {
         System.out.println("Number of square sum triples = " + ans);
     }
 }
+
