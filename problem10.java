@@ -1,31 +1,18 @@
-import java.util.Scanner;
-
 public class problem10 {
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        System.out.print("Enter number of balances: ");
-        int n = sc.nextInt();
-
-        int[] balance = new int[n];
-        System.out.println("Enter the balances (space-separated, can be negative):");
-        for (int i = 0; i < n; i++) {
-            balance[i] = sc.nextInt();
-        }
+        // Example input array
+        int[] balance = {2, -5, 3, 1};
 
         long result = minMoves(balance);
-
         System.out.println("Minimum moves needed: " + result);
-
-        sc.close();
     }
 
-    // Function directly inside the public class
     public static long minMoves(int[] balance) {
         int n = balance.length;
         int culpritIndex = -1;
         long sum = 0;
 
+        // Find last negative index and total sum
         for (int i = 0; i < n; i++) {
             sum += balance[i];
             if (balance[i] < 0) {
@@ -33,29 +20,30 @@ public class problem10 {
             }
         }
 
-        if (culpritIndex == -1) return 0;  // No negative balance
-        if (sum < 0) return -1;            // Impossible to fix
+        // No negative balance
+        if (culpritIndex == -1) return 0;
+
+        // Impossible case
+        if (sum < 0) return -1;
 
         long moves = 0;
-        int distance = 1;
+        int dist = 1;
 
+        // Fix negative balance
         while (balance[culpritIndex] < 0) {
-            int right = (culpritIndex + distance) % n;
-            int left = (culpritIndex - distance + n) % n;
+            int right = (culpritIndex + dist) % n;
+            int left = (culpritIndex - dist + n) % n;
 
-            long leftVal = balance[left];
-            long rightVal = balance[right];
-
-            long available = leftVal + rightVal;
-            if (left == right) available = rightVal;
+            long available = balance[left] + balance[right];
+            if (left == right) available -= balance[right]; // avoid double counting
 
             long needed = -balance[culpritIndex];
             long taken = Math.min(needed, available);
 
-            moves += taken * distance;
+            moves += taken * dist;
             balance[culpritIndex] += taken;
 
-            distance++;
+            dist++;
         }
 
         return moves;
