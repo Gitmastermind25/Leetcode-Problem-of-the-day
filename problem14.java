@@ -1,56 +1,54 @@
 import java.util.*;
 
-public class problem14 {
+class Solution {
 
-    // Method to calculate maximum profit
-    public static long maximumProfit(int[] prices, int k) {
+    public long maxProfit(int[] prices, int[] strategy, int k) {
         int n = prices.length;
 
-        // dp[day][transactionCount][state]
-        // state: 0 = no stock, 1 = holding stock
-        long[][][] dp = new long[n][k + 1][2];
+        long actualProfit = 0;
+        long[] profit = new long[n]; // original profit of each day
 
-        // Initialization
-        for (int t = 0; t <= k; t++) {
-            dp[0][t][0] = 0;
-            dp[0][t][1] = -prices[0];
+        // Calculate original profit
+        for (int i = 0; i < n; i++) {
+            profit[i] = (long) strategy[i] * prices[i];
+            actualProfit += profit[i];
         }
 
-        // DP computation
-        for (int day = 1; day < n; day++) {
-            for (int t = 0; t <= k; t++) {
+        long originalWindowProfit = 0;
+        long modifiedWindowProfit = 0;
+        long maxGain = 0;
 
-                // Not holding stock
-                dp[day][t][0] = dp[day - 1][t][0];
-                if (t > 0) {
-                    dp[day][t][0] = Math.max(
-                            dp[day][t][0],
-                            dp[day - 1][t - 1][1] + prices[day]
-                    );
-                }
+        int i = 0, j = 0;
 
-                // Holding stock
-                dp[day][t][1] = Math.max(
-                        dp[day - 1][t][1],
-                        dp[day - 1][t][0] - prices[day]
+        // Sliding window
+        while (j < n) {
+
+            // Add current element to original window
+            originalWindowProfit += profit[j];
+
+            // Second half of window → SELL
+            if (j - i + 1 > k / 2) {
+                modifiedWindowProfit += prices[j];
+            }
+
+            // Shrink window if size exceeds k
+            if (j - i + 1 > k) {
+                originalWindowProfit -= profit[i];
+                modifiedWindowProfit -= prices[i + k / 2];
+                i++;
+            }
+
+            // Evaluate window of exact size k
+            if (j - i + 1 == k) {
+                maxGain = Math.max(
+                    maxGain,
+                    modifiedWindowProfit - originalWindowProfit
                 );
             }
+
+            j++;
         }
 
-        long ans = 0;
-        for (int t = 0; t <= k; t++) {
-            ans = Math.max(ans, dp[n - 1][t][0]);
-        }
-        return ans;
-    }
-
-    // Main method with input
-    public static void main(String[] args) {
-
-        int[] prices = {3, 2, 6, 5, 0, 3};
-        int k = 2;
-
-        long result = maximumProfit(prices, k);
-        System.out.println("Maximum Profit = " + result);
+        return actualProfit + maxGain;
     }
 }
